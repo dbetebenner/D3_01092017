@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<title>D3 Block-a-Day: Day 9, January 9, 2017</title>
+<style>
+
+#wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
+
+path {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: .15px;
+}  
+
+path:hover {
+  fill: red;
+}
+
+</style>
+</head>
+<body>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="//d3js.org/topojson.v2.min.js"></script>
+<script src="https://d3js.org/d3-array.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+
+<div id="wrapper">
+   <div id="chart"></div>
+</div>
+
+<script>
+
+  var width = 960,
+    height = 600;
+  
+  const zoom = d3.zoom()
+      .scaleExtent([1/4, 7])
+      .on('zoom', function () {
+        d3.select('g').attr('transform', d3.event.transform)
+      });
+
+  const svg = d3.select('#chart')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .call(zoom)
+
+  const g = svg.append('g')
+
+  var projection = d3.geoAlbers()
+	  	.center([ -107.5534, 43.00029 ])
+	  	.translate([ -width*.85, -height ])
+      .scale(1200);
+
+  var path = d3.geoPath()
+      .projection(projection);
+
+  d3.json("USA_Districts_NO_PROPERTIES.json", function(error, state_districts) {
+  	if (error) throw error;
+
+  	g.selectAll("path")
+    	  .data(topojson.feature(state_districts, state_districts.objects.districts).features)
+		    .enter()
+		    .append("path")
+    	  .attr("d", path);
+	});
+</script>
+</body>
